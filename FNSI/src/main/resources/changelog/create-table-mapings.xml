@@ -1,0 +1,22 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+        <changeSet id="15.02.24.21:55" author="Dima">
+                <createTable tableName="mappings">
+                        <column name="id" type="bigint" autoIncrement="true">
+                                <constraints primaryKey="true" nullable="false"/>
+                        </column>
+                        <column name="system" type="varchar(100)">
+                                <constraints nullable="false"/>
+                        </column>
+                        <column name="version" type="numeric"/>
+                        <column name="code" type="varchar(200)"/>
+                        <column name="display" type="varchar(100)"/>
+                </createTable>
+                <addUniqueConstraint columnNames="system_version_mapping_unique_constraint, version"
+                                     constraintName="const_name"
+                                     schemaName="fnsi"
+                                     tableName="mappings"/>
+        </changeSet>
+</databaseChangeLog>

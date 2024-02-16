@@ -14,8 +14,8 @@
                         <column name="code" type="varchar(200)"/>
                         <column name="display" type="varchar(100)"/>
                 </createTable>
-                <addUniqueConstraint columnNames="system_version_mapping_unique_constraint, version"
-                                     constraintName="const_name"
+                <addUniqueConstraint columnNames="system, version"
+                                     constraintName="system_version_mapping_unique_constraint"
                                      schemaName="fnsi"
                                      tableName="mappings"/>
         </changeSet>

@@ -4,4 +4,6 @@
                         https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <include file="create-table-mapings.xml" relativeToChangelogFile="true"/>
+    <include file="dictionaries.xml" relativeToChangelogFile="true"/>
+    <include file="passports.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

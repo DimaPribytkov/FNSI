@@ -10,14 +10,14 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(name="dicitionaries")
+@Table(name="passports")
 
-public class Dictionaries {
+public class Passport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name="\"system\"")
     private String system;
     private String version;
-    private String code;
-    private String display;
+    private String data;
 }

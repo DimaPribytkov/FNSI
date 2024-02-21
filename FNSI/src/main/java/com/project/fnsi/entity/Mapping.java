@@ -18,7 +18,7 @@ public class Mapping {
 
     @Column(name = "\"system\"")
     private String system;
-    private double version;
+    private String version;
     private String code;
     private String display;
 

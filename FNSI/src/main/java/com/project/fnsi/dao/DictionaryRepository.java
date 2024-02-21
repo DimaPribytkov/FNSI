@@ -9,9 +9,8 @@ import org.springframework.data.repository.query.Param;
 public interface DictionaryRepository extends JpaRepository<Dictionary, Long> {
 
     @Query(value = "select d from Dictionary d where d.system =:system and d.version =:version and d.code =:code")
+    Dictionary findOne(@Param("system") String system, @Param("version") String version, @Param("code") String code);
 
-    Dictionary findBySystemByVersionByCode(@Param("system") String system, @Param("version") String version, @Param("code") String code);
-
-    @Query(value = "SELECT COUNT(d) FROM Dictionary d WHERE d.system = :system AND d.version = :version")
-    Long countBySystemAndVersion(@Param("system") String system, @Param("version") String version);
+    @Query(value = "select COUNT(d) from Dictionary d where d.system = :system and d.version = :version")
+    Long rowsCount(@Param("system") String system, @Param("version") String version);
 }

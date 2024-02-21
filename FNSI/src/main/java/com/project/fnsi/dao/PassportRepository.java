@@ -8,5 +8,5 @@ import org.springframework.data.repository.query.Param;
 
 public interface PassportRepository extends JpaRepository<Passport,Long> {
     @Query(value = "select p from Passport p where p.system =:system and p.version =:version")
-    Dictionary findBySystemByVersion(@Param("system") String system, @Param("version") String version);
+    Passport findOne(@Param("system") String system, @Param("version") String version);
 }

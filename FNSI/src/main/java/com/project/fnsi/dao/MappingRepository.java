@@ -9,6 +9,6 @@ import org.springframework.data.repository.query.Param;
 public interface MappingRepository extends JpaRepository<Mapping,Long> {
 
     @Query(value = "select m from Mapping m where m.system =:system and (m.version =:version OR m.version IS NULL )")
-    Dictionary findBySystemByVersion(@Param("system") String system, @Param("version") String version);
+    Mapping findAny(@Param("system") String system, @Param("version") String version);
 
 }

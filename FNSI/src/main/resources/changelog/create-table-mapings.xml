@@ -10,7 +10,7 @@
                         <column name="system" type="varchar(100)">
                                 <constraints nullable="false"/>
                         </column>
-                        <column name="version" type="varcahr(30)"/>
+                        <column name="version" type="varchar(30)"/>
                         <column name="code" type="varchar(200)"/>
                         <column name="display" type="varchar(100)"/>
                 </createTable>

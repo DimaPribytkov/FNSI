@@ -7,9 +7,13 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface MappingRepository extends JpaRepository<Mapping,Long> {
+public interface MappingRepository extends JpaRepository<Mapping, Long> {
 
-    @Query(value = "select m from Mapping m where m.system =:system and (m.version =:version OR m.version IS NULL )")
+    @Query(value = "SELECT m FROM Mapping m WHERE " +
+            "CASE " +
+            "    WHEN (SELECT COUNT(*) FROM Mapping WHERE system = :system AND version = :version) > 0 " +
+            "    THEN (m.system = :system AND m.version = :version) " +
+            "    ELSE (m.system = :system AND m.version IS NULL) " +
+            "END")
     Optional<Mapping> findAny(@Param("system") String system, @Param("version") String version);
-
 }

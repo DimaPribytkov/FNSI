@@ -14,6 +14,7 @@ public class MappingServiceImpl implements MappingService {
     private final MappingRepository mappingRepository;
     @Autowired
     public MappingServiceImpl(MappingRepository mappingRepository) {
+
         this.mappingRepository = mappingRepository;
     }
 

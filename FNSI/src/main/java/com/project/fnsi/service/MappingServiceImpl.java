@@ -14,6 +14,7 @@ public class MappingServiceImpl implements MappingService {
     private final MappingRepository mappingRepository;
     @Autowired
     public MappingServiceImpl(MappingRepository mappingRepository) {
+
         this.mappingRepository = mappingRepository;
     }
 
@@ -25,24 +26,22 @@ public class MappingServiceImpl implements MappingService {
 
     @Override
     @Transactional
-    public void addMapping(Mapping mapping) {
-        mappingRepository.save(mapping);
+    public Mapping addMapping(Mapping mapping) {
+        return mappingRepository.save(mapping);
     }
 
     @Override
     @Transactional
-    public void updateMapping(Mapping mapping) {
-        mappingRepository.save(mapping);
+    public Mapping updateMapping(Mapping mapping) {
+        return mappingRepository.save(mapping);
     }
 
     @Override
     @Transactional
     public void removeMapping(String system, String version) {
-        Mapping mapping = mappingRepository.findAny(system, version).orElse(null);
-        if (mapping==null){
-            throw new RuntimeException("Невозможно удалить mapping с системой " + system + " и версией " + version);
-        //todo  заменить рантайм на кастомное исключение
-        }
+        Mapping mapping = mappingRepository.findAny(system, version).orElseThrow(()->new RuntimeException("Невозможно " +
+                "удалить mapping с системой" + system + " и версией "  + version));
+
         mappingRepository.delete(mapping);
     }
 }

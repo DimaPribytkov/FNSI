@@ -2,12 +2,12 @@ package com.project.fnsi.service;
 
 import com.project.fnsi.entity.Mapping;
 
-public interface MappingService {
-    public Mapping getMappingBySystemAndVersion(String system, String version);
+   public interface MappingService {
+    Mapping getMappingBySystemAndVersion(String system, String version);
 
-    public void addMapping(Mapping mapping);
+    Mapping addMapping(Mapping mapping);
 
-    public void updateMapping(Mapping mapping);
+    Mapping updateMapping(Mapping mapping);
 
-    public void removeMapping(String system, String version);
+    void removeMapping(String system, String version);
 }

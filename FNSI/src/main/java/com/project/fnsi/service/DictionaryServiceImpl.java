@@ -37,10 +37,10 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Transactional
     @Override
     public void deleteDictionary(String system, String version, String code) {
-        Dictionary dictionary = dictionaryRepository.findOne(system, version, code).orElse(null);
-        if (dictionary==null){
-            throw new RuntimeException("Невозможно удалить справочник с такими параметрами");
-        }
+        Dictionary dictionary = dictionaryRepository.findOne(system, version, code)
+                .orElseThrow(() ->
+                        new RuntimeException("Справочника с такими системой, " + system + " версией " + version + " и кодом " + code + "нету."));
         dictionaryRepository.delete(dictionary);
+
     }
 }

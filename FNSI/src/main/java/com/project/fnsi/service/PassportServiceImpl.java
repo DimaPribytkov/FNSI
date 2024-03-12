@@ -1,5 +1,8 @@
 package com.project.fnsi.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.fnsi.dao.PassportRepository;
 import com.project.fnsi.entity.Passport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +13,15 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class PassportServiceImpl implements PassportService {
-
+    private final ObjectMapper objectMapper;
     private final PassportRepository passportRepository;
     private final RestTemplate restTemplate;
     @Value("${fnsi.key}")
     private String key;
 
     @Autowired
-    public PassportServiceImpl(PassportRepository passportRepository, RestTemplate restTemplate) {
+    public PassportServiceImpl(ObjectMapper objectMapper, PassportRepository passportRepository, RestTemplate restTemplate) {
+        this.objectMapper = objectMapper;
         this.passportRepository = passportRepository;
         this.restTemplate = restTemplate;
     }
@@ -32,14 +36,38 @@ public class PassportServiceImpl implements PassportService {
         return getPassportFromUrl(system, version);
     }
 
-    @Override
+    /*  @Override
     @Transactional
     public Passport getPassportFromUrl(String system, String version) {
         String data = restTemplate.getForObject("http://nsi.rosminzdrav.ru/port/rest/passport?userKey=" + key + "&identifier=" + system + "&version=" + version, String.class);
         // todo сделать проверку на отсутствие данных
+        try{
+            JsonNode jsonNode = objectMapper.readTree(data);
+            if(!jsonNode.get("result").asText().equals("OK")){
+                throw new RuntimeException(jsonNode.get("resultText").asText());
+            }
         Passport passport = passportRepository.findOne(system, version).orElse(new Passport(system, version));
         passport.setData(data);
-        return passportRepository.save(passport);
+        return passportRepository.save(passport);}
+    }*/
+    @Override
+    @Transactional
+    public Passport getPassportFromUrl(String system, String version) {
+        String data = restTemplate.getForObject("http://nsi.rosminzdrav.ru/port/rest/passport?userKey=" + key + "&identifier=" + system + "&version=" + version, String.class);
+
+
+        try {
+            JsonNode jsonNode = objectMapper.readTree(data);
+            if(!jsonNode.get("result").asText().equals("OK")) {
+                throw new RuntimeException(jsonNode.get("resultText").asText());
+            }
+
+            Passport passport = passportRepository.findOne(system, version).orElse(new Passport(system, version));
+            passport.setData(data);
+            return passportRepository.save(passport);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

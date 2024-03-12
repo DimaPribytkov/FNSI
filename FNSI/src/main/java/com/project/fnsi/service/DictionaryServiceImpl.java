@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 public class DictionaryServiceImpl implements DictionaryService {
 
@@ -80,7 +82,9 @@ public class DictionaryServiceImpl implements DictionaryService {
     public void deleteDictionary(String system, String version, String code) {
         Dictionary dictionary = dictionaryRepository.findOne(system, version, code)
                 .orElseThrow(() ->
-                        new RuntimeException("Справочника с такими системой, " + system + " версией " + version + " и кодом " + code + "нету."));
+                        new EntityNotFoundException("Невозможно удалить Dictionary с системой " + system + ", версией "
+                                + version + " и кодом " + code + ", так как Dictionary с этими параметрами отсутствует в базе данных"));
+
         dictionaryRepository.delete(dictionary);
 
     }

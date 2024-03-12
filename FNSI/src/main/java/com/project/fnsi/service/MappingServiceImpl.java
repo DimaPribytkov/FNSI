@@ -3,12 +3,15 @@ package com.project.fnsi.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.fnsi.exeptions.CreatingMappingException;
 import com.project.fnsi.dao.MappingRepository;
 import com.project.fnsi.entity.Mapping;
 import com.project.fnsi.entity.Passport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityNotFoundException;
 
 @Service
 public class MappingServiceImpl implements MappingService {
@@ -47,9 +50,9 @@ public class MappingServiceImpl implements MappingService {
                     display = key.get("field").asText();
                 }
             }
-            if (code == null || display == null) {
-                throw new RuntimeException("Для паспорта с системой " + system + " и версией " + version + " невозможно " +
-                        "автоматически создать маппинг полей");
+            if (code == null || display == null){
+                throw new CreatingMappingException("Для Passport с системой " + system + " и версией " + version + " невозможно " +
+                        "автоматически создать маппинг полей, если одно или оба из них пустые");
             }
             mapping = new Mapping(null, system, version, code, display);
             return mappingRepository.save(mapping);
@@ -73,8 +76,9 @@ public class MappingServiceImpl implements MappingService {
     @Override
     @Transactional
     public void removeMapping(String system, String version) {
-        Mapping mapping = mappingRepository.findAny(system, version).orElseThrow(() -> new RuntimeException("Невозможно " +
-                "удалить mapping с системой" + system + " и версией " + version));
+        Mapping mapping = mappingRepository.findAny(system, version).orElseThrow(()->new EntityNotFoundException("Невозможно " +
+                "удалить Mapping с системой" + system + " и версией "  + version + ", так как Mapping с этими параметрами отсутствует " +
+                "в базе данных"));
 
         mappingRepository.delete(mapping);
     }

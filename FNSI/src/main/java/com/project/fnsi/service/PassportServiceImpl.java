@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 public class PassportServiceImpl implements PassportService {
     private final ObjectMapper objectMapper;
@@ -68,14 +70,10 @@ public class PassportServiceImpl implements PassportService {
     @Override
     @Transactional
     public void removePassport(String system, String version) {
-        Passport passport = passportRepository.findOne(system, version).orElseThrow(() -> new RuntimeException("Невозможно " +
-                "удалить passport с системой" + system + " и версией " + version));
+        Passport passport = passportRepository.findOne(system, version).orElseThrow(()->new EntityNotFoundException("Невозможно " +
+                "удалить passport с системой" + system + " и версией "  + version + ", так как Passport с этими параметрами отсутствует в базе данных"));
 
         passportRepository.delete(passport);
-    }
-
-    private void mappingRules() {
-        //todo сделать позже.
     }
 
 }

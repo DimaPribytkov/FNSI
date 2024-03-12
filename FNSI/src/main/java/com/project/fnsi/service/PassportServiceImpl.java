@@ -15,6 +15,7 @@ public class PassportServiceImpl implements PassportService {
     private final RestTemplate restTemplate;
     @Value("${fnsi.key}")
     private String key;
+
     @Autowired
     public PassportServiceImpl(PassportRepository passportRepository, RestTemplate restTemplate) {
         this.passportRepository = passportRepository;
@@ -25,12 +26,19 @@ public class PassportServiceImpl implements PassportService {
     @Transactional
     public Passport getPassportBySystemAndVersion(String system, String version) {
         Passport passport = passportRepository.findOne(system, version).orElse(null);
-        if (passport != null){
+        if (passport != null && passport.getData() != null) {
             return passport;
         }
-        String data = restTemplate.getForObject("http://nsi.rosminzdrav.ru/port/rest/passport?userKey="+key+"&identifier="+system+"&version="+version, String.class);
-       // todo сделать проверку на отсутствие данных
-        passport = new Passport(null, system, version, data);
+        return getPassportFromUrl(system, version);
+    }
+
+    @Override
+    @Transactional
+    public Passport getPassportFromUrl(String system, String version) {
+        String data = restTemplate.getForObject("http://nsi.rosminzdrav.ru/port/rest/passport?userKey=" + key + "&identifier=" + system + "&version=" + version, String.class);
+        // todo сделать проверку на отсутствие данных
+        Passport passport = passportRepository.findOne(system, version).orElse(new Passport(system, version));
+        passport.setData(data);
         return passportRepository.save(passport);
     }
 
@@ -49,13 +57,13 @@ public class PassportServiceImpl implements PassportService {
     @Override
     @Transactional
     public void removePassport(String system, String version) {
-        Passport passport = passportRepository.findOne(system, version).orElseThrow(()->new RuntimeException("Невозможно " +
-                "удалить passport с системой" + system + " и версией "  + version));
+        Passport passport = passportRepository.findOne(system, version).orElseThrow(() -> new RuntimeException("Невозможно " +
+                "удалить passport с системой" + system + " и версией " + version));
 
         passportRepository.delete(passport);
     }
 
-    private void mappingRules(){
+    private void mappingRules() {
         //todo сделать позже.
     }
 

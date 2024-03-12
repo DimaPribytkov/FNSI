@@ -46,7 +46,7 @@ public class DictionaryServiceImpl implements DictionaryService {
                 throw new RuntimeException(jsonNode.get("resultText").asText());
             }
             String display = null;
-            for(JsonNode node: jsonNode.withArray("list")){
+            for(JsonNode node: jsonNode.withArray("list").get(0)){
                 if(node.get("column").asText().equals(mapping.getDisplay())){
                     display = node.get("value").asText();
                     break;

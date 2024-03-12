@@ -10,14 +10,18 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(name="passports")
+@Table(name = "passports")
 
 public class Passport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="\"system\"")
+    @Column(name = "\"system\"")
     private String system;
     private String version;
     private String data;
+    public Passport(String system, String version) {
+        this.system = system;
+        this.version = version;
+    }
 }

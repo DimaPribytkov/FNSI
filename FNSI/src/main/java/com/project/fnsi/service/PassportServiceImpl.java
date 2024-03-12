@@ -36,32 +36,15 @@ public class PassportServiceImpl implements PassportService {
         return getPassportFromUrl(system, version);
     }
 
-    /*  @Override
-    @Transactional
-    public Passport getPassportFromUrl(String system, String version) {
-        String data = restTemplate.getForObject("http://nsi.rosminzdrav.ru/port/rest/passport?userKey=" + key + "&identifier=" + system + "&version=" + version, String.class);
-        // todo сделать проверку на отсутствие данных
-        try{
-            JsonNode jsonNode = objectMapper.readTree(data);
-            if(!jsonNode.get("result").asText().equals("OK")){
-                throw new RuntimeException(jsonNode.get("resultText").asText());
-            }
-        Passport passport = passportRepository.findOne(system, version).orElse(new Passport(system, version));
-        passport.setData(data);
-        return passportRepository.save(passport);}
-    }*/
     @Override
     @Transactional
     public Passport getPassportFromUrl(String system, String version) {
         String data = restTemplate.getForObject("http://nsi.rosminzdrav.ru/port/rest/passport?userKey=" + key + "&identifier=" + system + "&version=" + version, String.class);
-
-
         try {
             JsonNode jsonNode = objectMapper.readTree(data);
             if(!jsonNode.get("result").asText().equals("OK")) {
                 throw new RuntimeException(jsonNode.get("resultText").asText());
             }
-
             Passport passport = passportRepository.findOne(system, version).orElse(new Passport(system, version));
             passport.setData(data);
             return passportRepository.save(passport);

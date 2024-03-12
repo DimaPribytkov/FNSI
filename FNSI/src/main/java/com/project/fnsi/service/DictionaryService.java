@@ -5,11 +5,11 @@ import com.project.fnsi.entity.Dictionary;
 public interface DictionaryService {
 
 
-    Dictionary getDirectory(String system, String version, String code);
+    Dictionary getDictionary(String system, String version, String code);
 
-    Dictionary addDirectory(Dictionary dictionary);
+    Dictionary addDictionary(Dictionary dictionary);
 
-    Dictionary updateDirectory(Dictionary dictionary);
+    Dictionary updateDictionary(Dictionary dictionary);
 
     void deleteDictionary(String system, String version, String code);
 }

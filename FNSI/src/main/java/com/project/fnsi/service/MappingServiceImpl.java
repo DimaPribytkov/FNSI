@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 @Service
 public class MappingServiceImpl implements MappingService {
@@ -81,5 +82,11 @@ public class MappingServiceImpl implements MappingService {
                 "в базе данных"));
 
         mappingRepository.delete(mapping);
+    }
+
+    @Override
+    @Transactional
+    public List<Mapping> getAllMapping(){
+        return mappingRepository.findAll();
     }
 }

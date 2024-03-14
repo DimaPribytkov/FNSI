@@ -17,7 +17,7 @@ public class MappingController {
         this.mappingService = mappingService;
 
     }
-    @GetMapping("/mappings")
+    @GetMapping("/")
     public List<Mapping> getAllMapping() {
         return mappingService.getAllMapping();
     }

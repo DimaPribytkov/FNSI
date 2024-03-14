@@ -10,7 +10,7 @@ public interface MappingService {
 
     Mapping addMapping(Mapping mapping);
 
-    Mapping updateMapping(Mapping mappings);
+    Mapping updateMapping(Mapping mapping);
 
     void removeMapping(String system, String version);
 

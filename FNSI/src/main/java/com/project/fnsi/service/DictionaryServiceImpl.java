@@ -8,6 +8,8 @@ import com.project.fnsi.entity.Dictionary;
 import com.project.fnsi.entity.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -34,6 +36,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Transactional
     @Override
+    @Cacheable(value = "dictionariesCach", key = "#system + #version + #code", cacheManager = "cacheManager")
     public Dictionary getDictionary(String system, String version, String code) {
         Dictionary dictionary = dictionaryRepository.findOne(system, version, code).orElse(null);
 
@@ -41,23 +44,23 @@ public class DictionaryServiceImpl implements DictionaryService {
             return dictionary;
         }
         Mapping mapping = mappingService.getMappingBySystemAndVersion(system, version);
-        String data = restTemplate.getForObject("http://nsi.rosminzdrav.ru/port/rest/data?userKey="+key+"&identifier="+system+"&version="+version+"&columns="+mapping.getCode()+","+mapping.getDisplay()+"&filters="+mapping.getCode()+"|"+code, String.class);
-        try{
+        String data = restTemplate.getForObject("http://nsi.rosminzdrav.ru/port/rest/data?userKey=" + key + "&identifier=" + system + "&version=" + version + "&columns=" + mapping.getCode() + "," + mapping.getDisplay() + "&filters=" + mapping.getCode() + "|" + code, String.class);
+        try {
             JsonNode jsonNode = objectMapper.readTree(data);
-            if(!jsonNode.get("result").asText().equals("OK")){
+            if (!jsonNode.get("result").asText().equals("OK")) {
                 throw new RuntimeException(jsonNode.get("resultText").asText());
             }
             String display = null;
-            for(JsonNode node: jsonNode.withArray("list").get(0)){
-                if(node.get("column").asText().equals(mapping.getDisplay())){
+            for (JsonNode node : jsonNode.withArray("list").get(0)) {
+                if (node.get("column").asText().equals(mapping.getDisplay())) {
                     display = node.get("value").asText();
                     break;
                 }
             }
-            if(display == null){
+            if (display == null) {
                 throw new RuntimeException("Не удалось автоматически получить значение");//todo
             }
-            dictionary = new Dictionary(null,system,version,code,display);
+            dictionary = new Dictionary(null, system, version, code, display);
             return dictionaryRepository.save(dictionary);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -68,6 +71,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Transactional
     @Override
     public Dictionary addDictionary(Dictionary dictionary) {
+
         return dictionaryRepository.save(dictionary);
     }
 
@@ -79,6 +83,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "dictionariesCach", key = "#system + #version + #code")
     public void deleteDictionary(String system, String version, String code) {
         Dictionary dictionary = dictionaryRepository.findOne(system, version, code)
                 .orElseThrow(() ->

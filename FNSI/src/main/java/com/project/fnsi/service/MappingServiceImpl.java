@@ -51,7 +51,7 @@ public class MappingServiceImpl implements MappingService {
                     display = key.get("field").asText();
                 }
             }
-            if (code == null || display == null){
+            if (code == null || display == null) {
                 throw new CreatingMappingException("Для Passport с системой " + system + " и версией " + version + " невозможно " +
                         "автоматически создать маппинг полей, если одно или оба из них пустые");
             }
@@ -77,8 +77,8 @@ public class MappingServiceImpl implements MappingService {
     @Override
     @Transactional
     public void removeMapping(String system, String version) {
-        Mapping mapping = mappingRepository.findAny(system, version).orElseThrow(()->new EntityNotFoundException("Невозможно " +
-                "удалить Mapping с системой" + system + " и версией "  + version + ", так как Mapping с этими параметрами отсутствует " +
+        Mapping mapping = mappingRepository.findAny(system, version).orElseThrow(() -> new EntityNotFoundException("Невозможно " +
+                "удалить Mapping с системой" + system + " и версией " + version + ", так как Mapping с этими параметрами отсутствует " +
                 "в базе данных"));
 
         mappingRepository.delete(mapping);
@@ -86,7 +86,7 @@ public class MappingServiceImpl implements MappingService {
 
     @Override
     @Transactional
-    public List<Mapping> getAllMapping(){
+    public List<Mapping> getAllMapping() {
         return mappingRepository.findAll();
     }
 }

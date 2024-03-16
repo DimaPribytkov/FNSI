@@ -44,7 +44,7 @@ public class PassportServiceImpl implements PassportService {
         String data = restTemplate.getForObject("http://nsi.rosminzdrav.ru/port/rest/passport?userKey=" + key + "&identifier=" + system + "&version=" + version, String.class);
         try {
             JsonNode jsonNode = objectMapper.readTree(data);
-            if(!jsonNode.get("result").asText().equals("OK")) {
+            if (!jsonNode.get("result").asText().equals("OK")) {
                 throw new RuntimeException(jsonNode.get("resultText").asText());
             }
             Passport passport = passportRepository.findOne(system, version).orElse(new Passport(system, version));
@@ -70,8 +70,8 @@ public class PassportServiceImpl implements PassportService {
     @Override
     @Transactional
     public void removePassport(String system, String version) {
-        Passport passport = passportRepository.findOne(system, version).orElseThrow(()->new EntityNotFoundException("Невозможно " +
-                "удалить passport с системой" + system + " и версией "  + version + ", так как Passport с этими параметрами отсутствует в базе данных"));
+        Passport passport = passportRepository.findOne(system, version).orElseThrow(() -> new EntityNotFoundException("Невозможно " +
+                "удалить passport с системой" + system + " и версией " + version + ", так как Passport с этими параметрами отсутствует в базе данных"));
 
         passportRepository.delete(passport);
     }

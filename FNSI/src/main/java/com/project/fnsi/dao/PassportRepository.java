@@ -1,6 +1,5 @@
 package com.project.fnsi.dao;
 
-import com.project.fnsi.entity.Dictionary;
 import com.project.fnsi.entity.Passport;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

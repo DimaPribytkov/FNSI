@@ -1,6 +1,5 @@
-package com.project.fnsi.controllers;
+package com.project.fnsi.controller;
 
-import com.project.fnsi.dao.MappingRepository;
 import com.project.fnsi.entity.Mapping;
 import com.project.fnsi.service.MappingService;
 import org.springframework.beans.factory.annotation.Autowired;

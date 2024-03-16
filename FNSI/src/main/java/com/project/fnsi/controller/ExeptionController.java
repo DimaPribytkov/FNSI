@@ -1,4 +1,4 @@
-package com.project.fnsi.controllers;
+package com.project.fnsi.controller;
 
 import com.project.fnsi.exeptions.CreatingMappingException;
 import com.project.fnsi.exeptions.AppExeptionData;

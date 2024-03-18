@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.fnsi.dao.DictionaryRepository;
 import com.project.fnsi.entity.Dictionary;
 import com.project.fnsi.entity.Mapping;
+import com.project.fnsi.entity.Passport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 @Service
 public class DictionaryServiceImpl implements DictionaryService {
@@ -25,13 +27,18 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Value("${fnsi.key}")
     private String key;
     private final MappingService mappingService;
+    private final PassportService passportService;
+    @Value("${p.size}")
+    private Integer pageSize;
+
 
     @Autowired
-    public DictionaryServiceImpl(DictionaryRepository dictionaryRepository, RestTemplate restTemplate, ObjectMapper objectMapper, MappingService mappingService) {
+    public DictionaryServiceImpl(DictionaryRepository dictionaryRepository, RestTemplate restTemplate, ObjectMapper objectMapper, MappingService mappingService, PassportService passportService) {
         this.dictionaryRepository = dictionaryRepository;
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.mappingService = mappingService;
+        this.passportService = passportService;
     }
 
     @Transactional
@@ -93,4 +100,53 @@ public class DictionaryServiceImpl implements DictionaryService {
         dictionaryRepository.delete(dictionary);
 
     }
+
+    public void updatePassportsAndLoadData() {
+
+        List<Passport> passports = passportService.getAllPassports();
+
+        for (Passport passport : passports) {
+            if (passport.getData() == null) {
+                passportService.getPassportFromUrl(passport.getSystem(), passport.getVersion());
+            }
+            Long rows;
+            try {
+                JsonNode jsonNode = objectMapper.readTree(passport.getData());
+                Mapping mapping = mappingService.getMappingBySystemAndVersion(passport.getSystem(), passport.getVersion());
+                rows = jsonNode.get("rowsCount").asLong();
+                if (rows.equals(dictionaryRepository.rowsCount(passport.getSystem(), passport.getVersion()))) {
+                    continue;
+                }
+                Long pageCount = rows / pageSize + 1;
+                for (int i = 1; i <= pageCount; i++) {
+
+                    String responseData = restTemplate.getForObject("http://nsi.rosminzdrav.ru/port/rest/data?userKey=" + key + "&identifier=" + passport.getSystem() + "&version=" + passport.getVersion() + "&page=" + i + "&size=" + pageSize + "&columns=" + mapping.getCode() + "," + mapping.getDisplay() + "&sorting=" + mapping.getDisplay(), String.class);
+                    JsonNode responseNode = objectMapper.readTree(responseData);
+                    for (JsonNode node : responseNode.withArray("list")) {
+                        String code = null;
+                        String display = null;
+                        for (JsonNode dictNode : node) {
+                            if (dictNode.get("column").asText().equals(mapping.getDisplay())) {
+                                display = dictNode.get("value").asText();
+                            }
+                            if (dictNode.get("column").asText().equals(mapping.getCode())) {
+                                code = dictNode.get("value").asText();
+                            }
+                        }
+                        if(display != null && code != null){
+                            Dictionary dictionary = dictionaryRepository.findOne(passport.getSystem(), passport.getVersion(), code).orElse(new Dictionary(null, passport.getSystem(), passport.getVersion(), code, display));
+                            dictionaryRepository.save(dictionary);
+                        }
+                    }
+
+                }
+
+
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }
+
+

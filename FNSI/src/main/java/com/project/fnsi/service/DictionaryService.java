@@ -12,4 +12,6 @@ public interface DictionaryService {
     Dictionary updateDictionary(Dictionary dictionary);
 
     void deleteDictionary(String system, String version, String code);
+
+    void updatePassportsAndLoadData();
 }

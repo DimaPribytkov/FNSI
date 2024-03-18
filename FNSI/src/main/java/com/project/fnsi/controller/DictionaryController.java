@@ -32,4 +32,8 @@ public class DictionaryController {
     public void deleteDictionary(@PathVariable String system, @PathVariable String version, @PathVariable String code) {
         dictionaryService.deleteDictionary(system, version, code);
     }
+    @GetMapping("/update")
+    public void upLoadDictionaries(){
+        dictionaryService.updatePassportsAndLoadData();
+    }
 }

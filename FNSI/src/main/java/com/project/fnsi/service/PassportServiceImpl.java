@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 @Service
 public class PassportServiceImpl implements PassportService {
@@ -74,6 +75,12 @@ public class PassportServiceImpl implements PassportService {
                 "удалить passport с системой" + system + " и версией " + version + ", так как Passport с этими параметрами отсутствует в базе данных"));
 
         passportRepository.delete(passport);
+    }
+
+    @Override
+    @Transactional
+    public List<Passport> getAllPassports() {
+        return passportRepository.findAll();
     }
 
 }

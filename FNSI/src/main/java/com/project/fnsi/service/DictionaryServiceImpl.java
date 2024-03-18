@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -43,7 +44,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Transactional
     @Override
-    @Cacheable(value = "dictionariesCach", key = "#system + #version + #code", cacheManager = "cacheManager")
+    @Cacheable(value = "dictionariesCache", key = "#system + #version + #code", cacheManager = "cacheManager")
     public Dictionary getDictionary(String system, String version, String code) {
         Dictionary dictionary = dictionaryRepository.findOne(system, version, code).orElse(null);
 
@@ -90,7 +91,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Transactional
     @Override
-    @CacheEvict(value = "dictionariesCach", key = "#system + #version + #code")
+    @CacheEvict(value = "dictionariesCache", key = "#system + #version + #code")
     public void deleteDictionary(String system, String version, String code) {
         Dictionary dictionary = dictionaryRepository.findOne(system, version, code)
                 .orElseThrow(() ->
@@ -100,14 +101,13 @@ public class DictionaryServiceImpl implements DictionaryService {
         dictionaryRepository.delete(dictionary);
 
     }
-
+    @Scheduled(cron = "${task.expression.cron}")
     public void updatePassportsAndLoadData() {
-
         List<Passport> passports = passportService.getAllPassports();
 
         for (Passport passport : passports) {
             if (passport.getData() == null) {
-                passportService.getPassportFromUrl(passport.getSystem(), passport.getVersion());
+                passport = passportService.getPassportFromUrl(passport.getSystem(), passport.getVersion());
             }
             Long rows;
             try {
